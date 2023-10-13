@@ -1,0 +1,22 @@
+#__ ~/.xbindkeysrc ____________________________________________________________
+#20230826_1839_(est) EJR
+
+# Bind shift + vertical scroll up to horizontal scroll left
+" xte 'mouseclick 6' "
+  shift + b:4  # button 4 is usually the vertical scroll up button
+
+# Bind shift + vertical scroll down to horizontal scroll right
+" xte 'mouseclick 7' "
+  shift + b:5  # button 5 is usually the vertical scroll down button
+
+# Bind button 9 to cycle desktop forward
+"xdotool key --clearmodifiers Ctrl+Alt+Left"
+  b:8
+
+# Bind button 9 to cycle desktop forward
+"xdotool key --clearmodifiers Ctrl+Alt+Right"
+  b:9
+
+# PASTE VIA TYPE
+"sleep .5; xdotool type $(xclip -o -selection clipboard)"
+  control + alt + v
