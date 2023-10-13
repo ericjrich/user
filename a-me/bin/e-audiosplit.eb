@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+#20230922_18:27_est--EJR
+#pip install spleeter
+#requires $HOME/a-me/z-share/spleeter/pretrained_models
+# VARS
+  zpne="$1" # get args
+  [ -z "$zpne" ] && zpne=$(zenity --file-selection --file-filter='*.mp3' --title="Select an MP3 file") # Use zenity to get input mp3 (ex. "/path/to/something.mp3")
+  [ -z "$zpne" ] && exit 0  # Check if zpne is empty and exit if it is
+  zp=$(dirname "$zpne")     # get the path of the mp3 file without the file (ex. "/path/to")
+  zne=$(basename "$zpne")   # get the mp3 files name without the path (ex. "something.mp3")
+  zn="${zne%.mp3}"          # get the name of the mp3 file without the path or the extension (ex. "something")
+  modelfile="$HOME/a-me/z-share/spleeter/pretrained_models"
+  od="/tmp"
+  odd="$od/$zn"                 #(ex. "/tmp/something")
+  ofbg="$odd/accompaniment.mp3" #(ex. "/tmp/something/accompaniment.mp3")
+  offg="$odd/vocals.mp3"        #(ex. "/tmp/something/vocals.mp3")
+  tobg="$zp/$zn-bg.mp3"             #(ex. "something-bg.mp3")
+  tofg="$zp/$zn-fg.mp3"             #(ex. "something-fg.mp3")
+# This tells spleeter where to find the pretrained_models
+  export MODEL_PATH="$modelfile"
+# This is the spleeter command
+  spleeter separate -p spleeter:2stems -o "$od" -c mp3 "$zne" #runs spleeter
+# copy outputs to new names and locations
+  cp "$ofbg" "$tobg"
+  cp "$offg" "$tofg"
+# CleanUp
+  rm -r "$odd"
+  clear
+  echo -e "Your New Files Are Here with the original file $zne\n Instrumentals:\t$tobg\n Vocals:\t$tofg"; echo

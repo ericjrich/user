@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+clear
+#=== vars
+	dictionary_file="/usr/share/dict/words"
+	total_words=$(wc -l < "$dictionary_file")
+	random_word_string=''
+	#words_per_line=2
+
+	echo 'How Many Words Per-Line?'; read words_per_line
+	echo 'How Many Seconds Delay After Read The Line?'; read zeeping
+#=== loop
+while true; do
+	for ((i = 1; i <= words_per_line; i++)); do
+		random_number=$((RANDOM % total_words + 1))
+		random_word=$(sed -n "${random_number}p" "$dictionary_file")
+		random_word_string="$random_word_string $random_word"
+	done
+	random_word_string=${random_word_string# }
+	echo "$random_word_string"
+	#spd-say -w -m some "$random_word_string"
+	#spd-say -w -m some -t male1 -p -1 -r -30 "$random_word_string"
+	spd-say -w -m some -t male1 "$random_word_string"
+
+	random_word_string=''
+	sleep $zeeping
+done

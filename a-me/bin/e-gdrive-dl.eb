@@ -1,0 +1,73 @@
+#!/bin/bash
+# G Drive DL
+#20230928_18:31_est--EJR
+
+### MAKE VARS ###################################
+pass='password'
+gdrive_dl='gdrive-download.7z'
+gdrive_new='gdrive_new.7z'
+gdid="just the id"
+
+### FUNCTIONS ###################################
+gdriveget.ef() { echo '==== DL & UnLock ===='
+wget --quiet --load-cookies /tmp/gdrive_cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/gdrive_cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$gdid" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$gdid" -O "$gdrive_dl" && rm -rf /tmp/gdrive_cookies.txt
+7z x -p"$pass" "$gdrive_dl"; rm "$gdrive_dl"; }
+
+new7z.ef() { zip27z=$(zenity --file-selection --title="MakeNew7z: Select a Zip File" --file-filter="Zip Files (*.zip) | *.zip"); [ -z "$zip27z" ] && return 1
+zipdir=$(dirname "$zip27z"); cd "$zipdir"; 7z a -mx=1 -p"$pass" -mhe=on "$gdrive_new" "$zip27z"; cd -; }
+
+read_password() { while true; do read -s -p 'Enter your password: ' pass; echo; read -s -p "Confirm your password: " pass_confirm; echo
+if [ "$pass" == "$pass_confirm" ]; then break; else echo "Passwords do not match. Please try again."; fi; done; }
+
+read_gdid() { echo 'Enter A Goodle Drive ID (just the id)'; read gdid; }
+read_gdlink() { echo 'Enter Link To Extract ID'; read gdlink; gdid=$(echo "$gdlink" | sed -n 's/.*\/d\/\([^/]*\)\/.*/\1/p'); }
+
+jumpto() { label=$1; cmd=$(sed -n "/$label:/{:a;n;p;ba};" $0 | grep -v ':$'); eval "$cmd"; exit; }
+
+### MENU ########################################
+mma:
+echo -n "$pass" | xclip -selection clipboard
+clear
+echo -e "Current Password:\t\e[2m$pass\e[0m\nCurrent GoogleID:\t\e[2m$gdid\e[0m\n\e[5m!!! Pass @ ClipBoard !!!\e[0m"
+echo ''
+echo -e "--- EJR: GDRIVE DOWNLOADER --- "
+echo '1) DL File:           (And UnLock)'
+echo '2) New 7z:            (add later to gdrive)'
+echo '3) New Pass:          (For This Session)'
+echo '4) New ID:   Via ID   (For This Session)'
+echo '5) New ID:   Via Link (For This Session)'
+echo 'x) Exit'
+read -rsn1 opkey; echo; opkey=${opkey,,}
+clear
+### CASES #######################################
+case $opkey in
+'1') jumpto mma1 ;;
+'2') jumpto mma2 ;;
+'3') jumpto mma3 ;;
+'4') jumpto mma4 ;;
+'5') jumpto mma5 ;;
+'x') exit 0;;
+*) exit 0;;
+esac
+### OPS (JUMP TO) ###############################
+## op1 ##
+mma1:
+  gdriveget.ef
+jumpto mma
+## op2 ##
+mma2:
+  gdriveget.ef
+jumpto mma
+## op3 ##
+mma3:
+  read_password
+jumpto mma
+## op4 ##
+mma4:
+  read_gdid
+jumpto mma
+## op5 ##
+mma5:
+  read_gdlink
+jumpto mma
+#################################################

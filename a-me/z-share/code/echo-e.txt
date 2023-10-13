@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# Bash echo -e special formatting codes
+# RESET
+  # - \e[0m  Reset all attributes, turning off any previous formatting.
+# TEXT: CONTROL
+  # - \n  This is the newline character. It's like hitting "Enter" to start a new line.
+  # - \t  Tab character. Useful for creating space between text.
+  # - \b  Backspace character. It moves the cursor one position to the left.
+  # - \r  Carriage return. It brings the cursor back to the beginning of the line.
+  # - \v  Vertical tab. A lesser-known one, but it can add a unique touch to your output.
+  # - \a  The bell character. It makes your terminal emit a bell sound. Rock on!
+  # - \e  Escape character. This one is versatile. You can use it for all sorts of special effects, especially when combined with other codes.
+  # - \033  This is the octal representation of the escape character. Great for more complex formatting.
+  # - \xHH  Hexadecimal representation of a character. You can replace HH with the hex value you want.
+  # - \c  Use this to suppress trailing newline characters. It keeps things on the same line.
+# COLOR: TEXT
+  # - \e[30m  Black text.
+  # - \e[31m  Red text.
+  # - \e[32m  Green text.
+  # - \e[33m  Yellow text.
+  # - \e[34m  Blue text.
+  # - \e[35m  Magenta text.
+  # - \e[36m  Cyan text.
+  # - \e[37m  White text.
+# COLOR: BACKGROUND
+  # - \e[40m  Black background.
+  # - \e[41m  Red background.
+  # - \e[42m  Green background.
+  # - \e[43m  Yellow background.
+  # - \e[44m  Blue background.
+  # - \e[45m  Magenta background.
+  # - \e[46m  Cyan background.
+  # - \e[47m  White background.
+# TEXT: EFFECTS
+  # - \e[1m  Bold text.
+  # - \e[2m  Dim or faint text.
+  # - \e[3m  Italicize text (not widely supported).
+  # - \e[4m  Underline text.
+  # - \e[5m  Blinking text (not recommended, as it can be distracting).
+  # - \e[7m  Invert the foreground and background colors.
+  # - \e[8m  Conceal or hide text (not widely supported).
+# 1. Displaying a bold and green message with a blue background.
+echo -e "\e[1;32;44mBold Green Text on Blue Background\e[0m"
+
+# 2. Printing a yellow warning message with an underline.
+echo -e "\e[33;4mWarning: This is an important message!\e[0m"
+
+# 3. Creating a red text with a black background.
+echo -e "\e[31;40mError: Something went wrong\e[0m"
+
+# 4. Making text blink (not recommended due to distraction).
+echo -e "\e[5mBlinking Text (Distracting!)\e[0m"
+
+# 5. Using the hexadecimal representation for color.
+echo -e "\e[38;2;255;0;0mHex Color: Red Text\e[0m"
+
+# 6. Displaying text without a trailing newline character.
+echo -e "This is on the same line.\c"
+
+# 7. Creating a cyan text with a magenta background.
+echo -e "\e[36;45mCyan on Magenta\e[0m"
+
+# 8. Inverting foreground and background colors.
+echo -e "\e[7mInverted Colors\e[0m"
+
+# 9. Printing a message with a vertical tab.
+echo -e "This is above.\vThis is below."
+
+# 10. Using the octal representation for escape character.
+echo -e "\033[1mOctal Escape: Bold Text\e[0m"
+
+# 11. Hiding text (not widely supported).
+echo -e "\e[8mHidden Text (May not work in all terminals)\e[0m"
+
+# 12. Displaying a message with italicized text (not widely supported).
+echo -e "\e[3mItalicized Text (May not work in all terminals)\e[0m"
+
+# 13. Printing a message with a bell sound.
+echo -e "This will ring the \aBELL!"
+
+# 14. Using the escape character for special effects.
+echo -e "This is \e[32mGreen\e[0m and this is \e[1;34mBold Blue\e[0m"
+
+# 15. Mixing different formatting options.
+echo -e "\e[1;33;41mBold Yellow Text on Red Background\e[0m"

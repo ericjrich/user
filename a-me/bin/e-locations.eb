@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+#20230929_06:31_est--EJR
+#=== SHORTCUT COMMANDS ========================================================
+#___Command______________________ShortCut_Ideas__________
+# bash -ic 'e-locations.eb'		??????????????????
+
+# vars
+homepc="$HOME"
+
+# arrays
+locations=(
+"PC_HOME" "$homepc/"
+"PC_AME" "$homepc/a-me/"
+"PC_BIN" "$homepc/a-me/bin/"
+)
+# Use Zenity to create a dialog for location selection
+  selection=$(zenity --list --title="Select a location" --text="Choose a location to open:" --column="Name" --column="Location" --width=600 --height=600 "${locations[@]}" --separator=" " --print-column=2)
+# Check if the user selected a location and open it
+  if [ -n "$selection" ]; then xdg-open "$selection"; else echo "No location selected."; fi

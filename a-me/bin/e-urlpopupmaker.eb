@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+#20230917_15:22_est--EJR
+
+# Vars
+default_url='https://'
+default_top=50
+default_left=30
+default_width=1300
+default_height=650
+
+# GUI: yad
+yad_out=$(yad --form \
+    --title='Make a PopUp Url' \
+    --text='Enter The Data for your new pop url' \
+    --field="Name:" ""\
+    --field="URL:" "$default_url"\
+    --field="Top (default $default_top):" "$default_top" \
+    --field="Left (default $default_left):" "$default_left" \
+    --field="Width (default $default_width):" "$default_width" \
+    --field="Height (default $default_height):" "$default_height" \
+    --button="Cancel:1" \
+    --button="OK:0")
+
+# parse $yad_out ('|' to ' ')
+IFS="|"; read -ra yadarr <<< "$yad_out"; IFS=""
+
+# Extract values from yadarr
+name="${yadarr[0]}"
+url="${yadarr[1]}"
+top_value="${yadarr[2]:-$default_top}"
+left_value="${yadarr[3]:-$default_left}"
+width_value="${yadarr[4]:-$default_width}"
+height_value="${yadarr[5]:-$default_height}"
+
+
+# Generate Url & Copy to clipboard & exit
+code="javascript:(function(){window.open('$url','pw-$name','top=$top_value,left=$left_value,width=$width_value,height=$height_value');})();"
+clear
+echo -n "$code" | xclip -selection clipboard
+exit 0

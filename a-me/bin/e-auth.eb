@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#20230925_19:21_est--EJR
+# Check if xclip and oathtool are installed
+if ! command -v xclip &> /dev/null; then
+  echo "xclip is not installed. Please run the following command to install it:"
+  echo "sudo apt-get install -y xclip"
+  exit 1
+fi
+
+if ! command -v oathtool &> /dev/null; then
+  echo "oathtool is not installed. Please run the following command to install it:"
+  echo "sudo apt-get install -y oathtool"
+  exit 1
+fi
+
+# Function to control the loop
+control_loop() {
+  while true; do
+    read -n 1 input < /dev/tty
+    if [[ "${input,,}" == 'q' ]]; then
+      clear
+      kill $(jobs -p)
+      break
+    fi
+  done
+}
+
+# Function for the background loop
+background_loop() {
+  while true; do
+    clear
+    zotp=$(oathtool --base32 --totp "$zseed")
+    echo -e "\e[32m\e[2m$zinfo\e[0m"
+    echo -e "\nOTP FOR \e[36m\e[1m$zname\e[0m (Copied To Clipboard):\n\e[33m$(figlet $zotp)\e[0m"
+    echo -e "\n**Press \e[5m( Q )\e[0m To Leave**"
+    if [ "$zotp" != "$last_otp" ]; then
+      echo -n "$zotp" | xclip -selection clipboard
+      last_otp="$zotp"
+    fi
+    sleep 1
+  done
+}
+
+# Initialize variables
+keys="1234567890qwertyuiopasdfghjklzxcvbnm"
+IFS=','; line_num=0; declare -A menu_options
+csv="$HOME/a-me/z-share/auth.csv"
+
+# Create arrays to store menu option details
+declare -a menu_names
+declare -a menu_seeds
+declare -a menu_users
+declare -a menu_passes
+declare -a menu_urls
+
+# Clear the terminal and display menu options
+clear
+while read -r line; do
+  if [ $line_num -gt 0 ]; then
+    IFS=',' read -r -a fields <<< "$line"
+    name="${fields[0]}"
+    seed="${fields[1]}"
+    user="${fields[2]}"
+    pass="${fields[3]}"
+    url="${fields[4]}"
+    key="${keys:0:1}"
+    keys="${keys:1}"
+    menu_options["$key"]="$name"
+    menu_names["$key"]="$name"
+    menu_seeds["$key"]="$seed"
+    menu_users["$key"]="$user"
+    menu_passes["$key"]="$pass"
+    menu_urls["$key"]="$url"
+    echo "$key - $name"
+  fi
+  ((line_num++))
+done < "$csv"
+
+# Display menu and handle user input
+echo 'Esc - Exit'
+echo "Hit Key For Option:"
+read -rsn1 press
+press=${press,,}
+
+case "$press" in
+  $'\e')
+    clear
+    exit 0
+    ;;
+  *)
+    if [ -n "${menu_options[$press]}" ]; then
+      zinfo="USER: ${menu_users[$press]}\nPASS: ${menu_passes[$press]}\nURL: ${menu_urls[$press]}"
+      zname="${menu_names[$press]}"
+      zseed="${menu_seeds[$press]}"
+      last_otp=""
+      background_loop & control_loop
+      clear
+    else
+      clear
+      exit 0
+    fi
+    ;;
+esac

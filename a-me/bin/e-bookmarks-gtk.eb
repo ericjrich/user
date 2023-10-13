@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+#20231001_22:30_est--EJR
+# bookmark manager for gtk3
+
+## VARS ##
+bookmark_sys="$HOME/.config/gtk-3.0/bookmarks"
+bookmark_baku="/media/$USER/YOUR-EXTERNAL-DEVICE/user/a-me/config/bookmark.txt"
+bookmark_bakp="$HOME/a-me/config/bookmark.txt"
+
+## MENU ##
+clear
+echo "1 - Backup Bookmarks"
+echo "2 - Restore Bookmarks"
+echo "X - EXIT"
+read -rsn1 inkey; echo; inkey="${inkey,,}"; clear
+
+## CASES ##
+case $inkey in
+    1)
+        echo "Backing up bookmarks..."
+        if [ -e "$bookmark_baku" ]; then
+            sed 's/\/e\//\/$USER\//g' "$bookmark_sys" > "$bookmark_baku"
+            sed 's/\/e\//\/$USER\//g' "$bookmark_sys" > "$bookmark_bakp"
+        else
+            sed 's/\/e\//\/$USER\//g' "$bookmark_sys" > "$bookmark_bakp"
+        fi
+        echo "Backup completed!"
+        exit 0
+        ;;
+    2)
+        echo "Restoring bookmarks..."
+        if [ -e "$bookmark_baku" ]; then
+            sed "s/\$USER/$(whoami)/g" "$bookmark_baku" > "$bookmark_bakp"
+            sed "s/\$USER/$(whoami)/g" "$bookmark_baku" > "$bookmark_sys"
+        else
+            sed "s/\$USER/$(whoami)/g" "$bookmark_bakp" > "$bookmark_sys"
+        fi
+        echo "Restoration completed!"
+        exit 0
+        ;;
+    x|X)
+        echo "Exiting the script. Goodbye!"
+        exit 0
+        ;;
+    *)
+        echo "Invalid option. Please choose 1, 2, or X."
+        ;;
+esac

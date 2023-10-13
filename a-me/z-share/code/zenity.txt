@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; [ -z "$var" ] && return 1
+; [ -z "$var" ] && exit 1
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+; [ -e "$dir" ] && exit 1
+; [ -e "$dir" ] && return 1
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zen_sel_dir=$(zenity --title="SELECT DIR" --file-selection --directory)
+zen_sel_dirs=$(zenity --title='SELECT DIRS' --file-selection --directory --multiple --separator=$'\n')
+zen_sel_file=$(zenity --title='SELECT FILE' --file-selection)
+zen_sel_files=$(zenity --title='SELECT FILES' --file-selection --multiple --separator=$'\n')
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zen_sav_dir=$(zenity --file-selection --directory --save --confirm-overwrite --title='SAVE: DIR')
+zen_sav_file=$(zenity --file-selection --save --confirm-overwrite --title='SAVE: DIR & FILE.EXT')
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zen_sel_file=$(zenity --title='SELECT FILE' --file-selection)
+  name=$(basename "$zen_sel_file" | cut -f 1 -d '.')
+  ext=$(basename "$zen_sel_file" | cut -f 2 -d '.')
+  echo $name
+  echo $ext
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zen_ask_nameext=$(zenity --entry --title='NAME.EXT ?' --text='Enter NAME.EXT:')
+  name=$(basename "$zen_ask_nameext" | cut -f 1 -d '.')
+  ext=$(basename "$zen_ask_nameext" | cut -f 2 -d '.')
+  echo $name
+  echo $ext
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+filter='*.mp3 *.MP3 *.ogg *.OGG *.opus *.OPUS *.mp4 *.MP4 *.mkv *.MKV *.avi *.AVI *.wav *.WAV *.m4a *.M4A *.aac *.AAC *.flac *.FLAC *.wma *.WMA *.webm *.WEBM *.mov *.MOV'
+  file_select_multi_media=$(zenity --file-selection --file-filter="$filter" --title="Select Media To Open")
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+zen_table_varr=(
+"col1a" "col2a"
+"col1b" "col2b"
+)
+# Use Zenity to create a dialog for location selection
+zen_table_col1=$(zenity --list --title="CHOOSE" --text="CHOOSE:" --column="COL1" --column="COL2" --width=600 --height=600 "${zen_table_varr[@]}" --separator=" " --print-column=1)
+  clear; echo -e "Col1 Output\n $zen_table_col1"; read -p 'ENTER' junk
+zen_table_col2=$(zenity --list --title="CHOOSE" --text="CHOOSE:" --column="COL1" --column="COL2" --width=600 --height=600 "${zen_table_varr[@]}" --separator=" " --print-column=2)
+  clear; echo -e "Col1 Output\n $zen_table_col2"; read -p 'ENTER' junk
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

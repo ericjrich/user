@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#20230726 1230 est EJR
+
+#~~xdo type~~good for vm without clipboard enabled~~~~~~~~~
+
+	#select & copy your text
+		clear
+		echo 'Copy Text To Clipboard, then hit ENTER to continue'
+		read idgaf
+
+	# Get clipboard text
+		typezzz=$(xclip -o -selection clipboard)
+
+	# Count down
+		clear
+		echo '5 - Going To Type Your Clipboard Out'; sleep 1; clear
+		echo '4 - Going To Type Your Clipboard Out'; sleep 1; clear
+		echo '3 - Going To Type Your Clipboard Out'; sleep 1; clear
+		echo '2 - Going To Type Your Clipboard Out'; sleep 1; clear
+		echo '1 - Going To Type Your Clipboard Out'; sleep 1; clear
+
+	# Split the clipboard content by newlines and type each line
+		while IFS= read -r line; do
+			xdotool type --clearmodifiers --delay 50 "$line"
+			xdotool key Return
+		done <<< "$typezzz"

@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+#2023-07-23  2150 est EJR
+#I Set: linux mint to not auto mount fs
+#I Set: Phones USB Default To Charging
+#I Set: Phones USB-Debugging to ON
+#YOU CAN UNSTRUST DEVICES ON YOUR PHONE SIDE TOO IF YOU WANT
+clear
+#-------------------------------------------------------------------
+echo '== ADB SCREEN =='
+echo '1 - ADB Phone:  Connect'
+echo '2 - ADB Phone:  ReConnect'
+echo '3 - ADB Device: FireTV'
+echo 'x - Exit'
+read -n 1 choice
+echo; clear
+#-------------------------------------------------------------------
+case "$choice" in
+'1') #--------------------------------------------------------------
+    clear
+    read -n 1 -p "Press any key to continue... "; echo
+    read -n 1 -p '****** Unplug Phone ******'; echo
+    killall adb; rm -R ~/.android/
+    read -n 1 -p '****** PlugIn Phone ******'; echo
+    adb devices
+    echo '============= Waiting for device ================='
+    adb wait-for-device
+    echo ''; echo '------------Getting IP-----------------------'
+    ip=$(adb shell ip route | awk '{print $9}' | tail -1)
+    echo "Device ip: $ip"
+    echo ''; echo '-------------Setting Up tcpip port-----------'
+    adb tcpip 5555
+    sleep 5
+    echo "---------------------Connecting To $ip---------------"
+    adb connect $ip:5555
+    # adb connect $ip:5555
+    echo ''
+    read -n 1 -p '****** Unplug Phone ******'; echo
+    echo ''; echo '--------Going To Display Phone---------------'; echo ''
+    scrcpy -s $ip --stay-awake --turn-screen-off >>/dev/null 2>&1 & disown
+    sleep 1
+    xdotool getactivewindow windowmove %@ 0 0
+;;
+'2') #--------------------------------------------------------------
+    clear
+    ip=$(adb shell ip route | awk '{print $9}' | tail -1)
+    echo '......Going To Display Phone......'
+    echo ''
+    scrcpy -s $ip --stay-awake --turn-screen-off >>/dev/null 2>&1 & disown
+    sleep 1
+    xdotool getactivewindow windowmove %@ 0 0
+;;
+'3') #--------------------------------------------------------------
+    #clear kill
+        killall adb
+        rm -R ~/.android/
+        clear
+
+    # Prompt for the IP address
+        read -p "Enter the Fire TV IP address: " ip
+        echo '-----------------------------------------------------------------------'
+    # Connect to the Fire TV device
+        adb connect $ip:5555
+        echo '-----------------------------------------------------------------------'
+    #waiting
+        echo '    ============= Waiting for you to allow device ================='
+        echo
+        adb wait-for-device
+        echo '-----------------------------------------------------------------------'
+    #check devices
+        echo '    ======== Check if it worked. Here is device list =============='
+        adb devices
+        echo '-----------------------------------------------------------------------'
+        echo ' **you can now run commands like these**'
+        echo '> scrcpy'
+        echo '> adb install file.apk'
+        echo '> adb shell'
+		#ask about screen display
+        echo '-----------------------------------------------------------------------'
+        read -n 1 -p "Would You Like To See Your Devices On This PC? (y/n) " response; echo
+        [ "$response" != "y" ] && exit 0
+				echo '............Going To Display Screen............'
+				scrcpy -s $ip >>/dev/null 2>&1 & disown
+				sleep 1
+				xdotool getactivewindow windowmove %@ 0 0
+
+;;
+'x') #--------------------------------------------------------------
+    exit 0
+;;
+*) #----------------------------------------------------------------
+    exit 0
+;;
+esac
+#-------------------------------------------------------------------

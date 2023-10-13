@@ -1,0 +1,3 @@
+file:///home/$USER/Documents Documents
+file:///home/$USER/Downloads Downloads
+file:///home/$USER/a-me/bin _PC: BIN

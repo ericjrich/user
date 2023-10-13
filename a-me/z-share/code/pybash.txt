@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# python in bash
+#20230930_14:19_est--EJR
+
+## FUNCS ##
+py1() {
+local i1="$1"; local i2="$2"
+local code=$(cat <<'PYEOF'
+#!/usr/bin/env python3
+import os, subprocess, sys
+i1 = sys.argv[1]
+i2 = sys.argv[2]
+o1 = f"Bash Message: {i1} | This whole text will go back to bash via o1 then p1o1"
+o2 = f"Bash Message: {i2} | This whole text will go back to bash via o2 then p1o2"
+print(f"{o1}\n{o2}", flush=True)
+PYEOF
+)
+local po=$(python3 -c "$code" "$i1" "$i2")
+p1o1=$(echo "$po" | sed -n '1p')
+p1o2=$(echo "$po" | sed -n '2p')
+}
+
+## BODY ##
+clear
+# info
+echo -e "In bash we are creating two variable:\n p1i1=\"(bash says i am p1i1)\"\n  AND\n p1i2=\"(bash says i am p1i2)\"\nThey will be Exported To Python In Our Function:\n py1 \"\$p1i1\" \"\$p1i2\"\n "
+echo '----Hit Any Key----'; read -rsn1 junk; echo '================================'
+# code
+p1i1="(bash says i am p1i1)"; p1i2="(bash says i am p1i2)"
+py1 "$p1i1" "$p1i2" # Run python with these variables
+echo -e "---Python Output---\n $p1o1 \n $p1o2 " # Show Results

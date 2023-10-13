@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#20230917_15:22_est--EJR
+
+#= Vars ===============================
+ytitle='Generic Title'
+ytext='Generic Explaination'
+
+yf0n='Feild-Name'
+yf0='Feild-User_Input_Value_Default'
+
+yf1n='Feild-Name'
+yf1='Feild-User_Input_Value_Default'
+
+#= GUI: yad ===========================
+yado=$(yad --form \
+    --title="$ytitle" \
+    --text="$ytext" \
+    --field="$yf0n" "$yf0"\
+    --field="$yf1n" "$yf1"\
+    --button="Cancel:1" \
+    --button="OK:0")
+
+#= parse $yado ('|' to ' ') ===========
+IFS="|"; read -ra yada <<< "$yado"; IFS=""
+
+#= Extract values from yada ===========
+yf0="${yada[0]}"
+yf1="${yada[1]}"
+
+#= Show User The Outputs ==============
+clear
+echo 'Here is the data you entered, Use it to make something cool!'
+echo "$yf0"
+echo "$yf1"
+# make some cool stuff now using the outputs you get

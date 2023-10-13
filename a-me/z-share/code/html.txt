@@ -1,0 +1,25 @@
+<html><head><style>
+/*============================================================================*/
+	/*====CSS CODE HERE====*/
+	body 		{position:fixed;inset:0;background-color:black;color:white;}
+	#d0			{position:fixed;inset:0;}/*whole page*/
+	img			{position:absolute;width:100%;height:100%;}
+	a				{position:absolute;width:100%;height:100%;text-decoration: none;}
+	.fill		{position:absolute;width:100%;height:100%;}
+	.flex		{display:flex;flex-flow:wrap;align-content:space-around;justify-content:center;}
+/*============================================================================*/
+</style><script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script><script>
+$(function(){
+/*============================================================================*/
+	/*====JQUERY/JS CODE HERE====*/
+
+
+/*============================================================================*/
+});
+</script></head><body><div id='d0'>
+<!--===========================================================================================-->
+	<!--==HTML CODE HERE==-->
+
+
+<!--===========================================================================================-->
+</div><!--#d0--></body></html>

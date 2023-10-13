@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+sleep 1
+zexit=''
+a=''
+while [ "$zexit" != 'x' ]
+do
+t=$(xdotool getmouselocation |awk -F'[ :]' '{print $2,$4}')
+a=$(echo -e "$a\n$t")
+clear
+echo -e "$a"
+read -p 'x?' zexit
+done

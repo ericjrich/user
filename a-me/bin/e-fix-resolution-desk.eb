@@ -1,0 +1,11 @@
+#!/bin/bash
+#add to startup stuff in settings
+#wont need this: bash -ic 'e-fix-resolution-desk.eb'
+#gtf 1366 768 60
+#== V1 ====
+xrandr --newmode "1368x768_60.00" 85.86 1368 1440 1584 1800 768 769 772 795 -HSync +Vsync
+xrandr --addmode HDMI-1 "1368x768_60.00"
+xrandr --addmode HDMI-2 "1368x768_60.00"
+xrandr --output HDMI-1 --mode "1368x768_60.00" --pos 0x0
+xrandr --output HDMI-2 --mode "1368x768_60.00" --pos 1368x0
+#== V2 ====

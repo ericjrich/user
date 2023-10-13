@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#20221229 0900 EJR
+#~~TREE TO HTML~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#e.tree2html.ef() {
+indirzzz=$(zenity --file-selection --directory --title='Select Dir To Run Tree On'); if [ $? == 1 ]; then exit 0; fi
+outdirzzz=$(zenity --file-selection --directory --title='Select Dir To Save Output File'); if [ $? == 1 ]; then exit 0; fi
+outname=$(zenity --entry --title='Name Output File' --text='Name Output File ( NO - EXT ):' --entry-text "tree"); if [ $? == 1 ]; then exit 0; fi
+
+tree --dirsfirst -afhFD $indirzzz/ -H $indirzzz/ -o $outdirzzz/$outname.html
+#}

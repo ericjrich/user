@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+#20231002_18:18_est--EJR
+#Script to make a Ventoy USB From The tar.gz ventoy file
+
+shopt -s dotglob
+sudo clear
+
+### FUNCS ###########################################################
+crap() { read -n 1 -p '*ANY-KEY*'; echo; }
+
+### SHARED ##########################################################
+ztmp="/tmp/ventoytmp"; rm -rf "$ztmp"
+TarDir="$HOME/a-me/z-share"
+TarFileBn="ventoy-*-linux.tar.gz"
+TarFile=$(find "$TarDir" -name "$TarFileBn" -print -quit)
+####
+[ -e "$TarFile" ] && targzfile="$TarFile"
+[ -e "$TarDir" ] && cd "$TarDir" # Starting DIR
+####
+[ ! -e "$TarFile" ] && targzfile=$(zenity --file-selection --title="Select Ventoy tar.gz file"); [ ! -e "$targzfile" ] && exit 0 # ASK IF NEEDED
+vtoyXX=$(echo "$targzfile" | grep -oP 'ventoy-\K\d+\.\d+\.\d+'); [ -z "$vtoyXX" ] && exit 0 #VERSION OF VENTOY: USED WHEN EXTRACTING ARCHIVE
+zensdx=$(zenity --file-selection --directory --title="Select target USB drive"); [ -z "$zensdx" ] && exit 0
+sdx=$(findmnt -no SOURCE "$zensdx" | cut -c 6- | sed 's/[0-9]*$//')
+DevSdx="/dev/$sdx"
+sudo umount "$DevSdx"*
+lsblk "$DevSdx" -o NAME,LABEL,SIZE; echo 'User Partition in MB ?'; read PartSize_4_Vtoy; [ -z "$PartSize_4_Vtoy" ] && exit 0
+
+### MENU ############################################################
+clear
+echo 'Now We Decide How We Continue With This'
+echo '1) Old Method'
+echo '2) Testing Method'
+echo 'x) Exit'
+read -rsn1 inkey; echo; inkey=${inkey,,}; clear; case $inkey in
+
+### CASES ###########################################################
+1) #----- OLD METHOD --------------------------------------
+mkdir -p "$ztmp"; tar -xf "$targzfile" -C "$ztmp"
+sudo "$ztmp"/ventoy-$vtoyXX/Ventoy2Disk.sh -g -r "$PartSize_4_Vtoy" -I "$DevSdx"
+rm -rf "$ztmp"
+;;
+
+2) #----- NEW METHOD (TESTING) ----------------------------
+echo -n 'User Partition Name ? '; read PartName; [ -z "$PartName" ] && exit 0
+mkdir -p "$ztmp"; tar -xf "$targzfile" -C "$ztmp"
+echo -e "y\ny\n" | sudo "$ztmp"/ventoy-$vtoyXX/Ventoy2Disk.sh -g -r "$PartSize_4_Vtoy" -I "$DevSdx"
+rm -rf "$ztmp" #CLEAN UP
+# ----------------------
+# USE "$DevSdx" TO FIGURE OUT THE END NUMBER FOR THE EMPTY PARTITION > "$Num"
+  Num=$(sudo parted "$DevSdx" print | awk '/^ [0-9]+ / {print $1}' | sort -n | tail -n 1); if [ -z "$Num" ]; then Num=1; else Num=$((Num + 1)); fi
+# USE "$DevSdx" FOR FDISK AND RUN IT HANDS OFF
+  echo -e "n\n\n\n\ny\nw\n\n" | sudo fdisk "$DevSdx"
+# USE "$DevSdx$Num" FOR MAKING THE EXT4 FILE SYSTEM (HAND OFF)
+  sudo mkfs.ext4 -F "$DevSdx$Num"
+# USE "$DevSdx$Num" "$PartName" TO NAME THE PARTITION
+  sudo e2label "$DevSdx$Num" "$PartName"
+;;
+esac

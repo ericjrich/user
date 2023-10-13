@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#20230103 1020 est EJR
+#===========================================================================
+# Custom KBD SHORTCUT:
+ #CTRL-ALT-M
+ #x-terminal-emulator -e 'bash -ic e-fix-audio.eb'
+#=README==
+# FIRST TIME I RAN THIS TO MAKE MY HEADPHONES WORK I SHUTDOWN AND POWER-ON (NOT RESET)
+# AFTER THAT I USE IT DURING THE SESSION TO FIX POPPING
+
+#--CODE-----------------------
+# Remove pulse config
+ rm -r ~/.config/pulse/
+# Remove alsa config
+ sudo rm /var/lib/alsa/asound.state
+#restart alsa
+ sudo alsactl init
+ sudo alsactl store
+ sudo alsa force-reload
+#restart pulse
+ pulseaudio -k
+# Flip the 1 to a 0
+  sudo sh -c "echo 0 > /sys/module/snd_hda_intel/parameters/power_save"
+# Flip the Y to a N
+  sudo sh -c "echo N > /sys/module/snd_hda_intel/parameters/power_save_controller"

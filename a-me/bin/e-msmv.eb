@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+#20230121 1410 est EJR
+#Part Of A Script Set: e-msmv.eb e-mscl.eb
+#Dependencies= xdotool python3
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#=== SHORTCUT COMMANDS ========================================================
+#------------------------------------------------------------------------------
+# e-msmv.eb
+#
+#___Command________________________Description_________ShortCut_Ideas__________
+# bash -ic 'e-msmv.eb up fast'		(MouseMove Up Fast)			Ctrl+Alt+Super+Up
+# bash -ic 'e-msmv.eb up slow'		(MouseMove Up Slow)			Ctrl+Super+Up
+#
+# bash -ic 'e-msmv.eb down fast'	(MouseMove Down Fast)		Ctrl+Alt+Super+Down
+# bash -ic 'e-msmv.eb down slow'	(MouseMove Down Slow)		Ctrl+Super+Down
+#
+# bash -ic 'e-msmv.eb left fast'	(MouseMove Left Fast)		Ctrl+Alt+Super+Left
+# bash -ic 'e-msmv.eb left slow'	(MouseMove Left Slow)		Ctrl+Super+Left
+#
+# bash -ic 'e-msmv.eb right fast'	(MouseMove Right Fast)	Ctrl+Alt+Super+Right
+# bash -ic 'e-msmv.eb right slow'	(MouseMove Right Slow)	Ctrl+Super+Right
+#
+#------------------------------------------------------------------------------
+# e-mscl.eb
+#
+#___Command________________________Description_________ShortCut_Ideas__________
+# bash -ic 'e-mscl.eb 1'	       	(Click Left Btn)			 	Ctrl+Alt+Super+Delete
+# bash -ic 'e-mscl.eb 2'	        (Click Midl Btn)			 	Ctrl+Alt+Super+End
+# bash -ic 'e-mscl.eb 3'	        (Click Rght Btn)			 	Ctrl+Alt+Super+PgDown
+#
+# bash -ic 'e-mscl.eb la'			    (Select Location A)			Ctrl+Alt+Super+Insert
+# bash -ic 'e-mscl.eb lb'			    (Select Location B)			Ctrl+Alt+Super+Home
+# bash -ic 'e-mscl.eb lc'		      (Drag Win A to B)				Ctrl+Alt+Super+PgUp
+#
+#==============================================================================
+
+
+import subprocess
+import sys
+#--- Don't change these lines:
+direction = sys.argv[1]
+speed = sys.argv[2]
+#--- Change the steps below if you'd like to
+big_step = 50
+small_step = 3
+#---
+
+step = big_step if speed == "fast" else small_step
+step = -step if direction == "left" or direction == "up" else step
+get = lambda cmd: subprocess.check_output(cmd).decode("utf-8")
+
+def move():
+	coords = [int(it.split(":")[1]) for it in get(["xdotool", "getmouselocation"]).split()[:2]]
+	if direction in ["left", "right"]:
+		cmd = "xdotool", "mousemove", str(coords[0]+step), str(coords[1])
+	elif direction in ["up", "down"]:
+		cmd = "xdotool", "mousemove", str(coords[0]), str(coords[1]+step)
+	subprocess.call(cmd)
+move()

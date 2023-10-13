@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Make A Searchable Html File From A CSV
+
+###################
+clear
+tdir="/tmp/csv2html"; rm -r "$tdir"; mkdir "$tdir"
+csv_file="$(zenity --file-selection --file-filter='CSV files ( *.csv ) | *.csv' --title='Select a CSV file')"
+  if [ $? -eq 1 ]; then zenity --info --text="No file selected. Exiting."; rm -r "$tdir"; exit 1; fi
+csv_name_noext=$(basename -- "$csv_file"); csv_name_noext="${csv_name_noext%.*}"
+cp "$csv_file" "$tdir/"; csv_file="$tdir/$csv_name_noext.csv"; sed -i -e '$a\' "$csv_file"
+out_dir="$(zenity --file-selection --directory --title='Select a directory to save the output')"
+  if [ $? -eq 1 ]; then zenity --info --text="No output directory selected. Exiting."; rm -r "$tdir"; exit 1; fi
+clear
+echo 'Name the output html file (no ext):'; read html_name_noext
+html_file="$out_dir/$html_name_noext.html"; rm "$html_file"; touch "$html_file"
+
+###################
+cat <<EOF > "$html_file"
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>$html_name_noext</title>
+<style>table{border-collapse:collapse;width:100%;}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd;}tr:hover{background-color:#f5f5f5;}</style></head><body>
+<h1>$html_name_noext</h1>
+<input type="text" id="search" onkeyup="searchTable()" placeholder="Search...">
+<table id="table1"><thead><tr>
+EOF
+
+###################
+IFS=',' read -r -a headers <<< "$(head -n 1 "$csv_file")"
+for header in "${headers[@]}"; do echo "<th>$header</th>" >> "$html_file"; done
+echo "</tr></thead><tbody>" >> "$html_file"
+
+###################
+while IFS=',' read -r -a row; do
+    echo "<tr>" >> "$html_file"
+    for col in "${row[@]}"; do echo "<td>$col</td>" >> "$html_file"; done
+    echo "</tr>" >> "$html_file"
+done < <(tail -n +2 "$csv_file")
+
+###################
+cat <<EOF >> "$html_file"
+</tbody></table><script>
+function searchTable() {const filter = document.getElementById("search").value.toLowerCase();
+const rows = document.querySelectorAll("#table1 tr");rows.forEach(row => {const cells = Array.from(row.querySelectorAll("td"))
+const found = cells.some(cell => cell.textContent.toLowerCase().includes(filter)); row.style.display = found ? "" : "none";});}
+</script></body></html>
+EOF
+
+###################
+rm -r "$tdir"; clear; echo -e "Your Output Is:\n $html_file

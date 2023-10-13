@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#txt to speech from the clipboard
+#hotkey
+#~~brightness controller~~~~~~
+  #command
+    #bash -ic 'e-tts.eb'
+  #keys to bind
+    #Super + T
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Get the contents of the clipboard
+clipboard=$(xclip -o -selection clipboard)
+
+# Check if the clipboard is not empty
+if [[ -n "$clipboard" ]]; then
+  # Use spd-say to speak the clipboard contents
+  #spd-say -w -m some "$clipboard"
+	spd-say -w -m some -t male1 "$clipboard"
+else
+  echo "Clipboard is empty."
+fi

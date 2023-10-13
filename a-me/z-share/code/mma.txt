@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+#Menu Template Using Jump
+#20230930_14:08_est--EJR
+## FUNCS ##
+jumpto() { label=$1; cmd=$(sed -n "/$label:/{:a;n;p;ba};" $0 | grep -v ':$'); eval "$cmd"; exit; }
+## VARS ##
+#allops="op1 op2 op3 op4 op5 op6 op7 op8 op9 op0 opq opw ope opr opt opy opu opi opo opp opa ops opd opf opg oph opj opk opl opz opx opc opv opb opn opm"
+allops="op1 op2 op3 op4 op5 op6 op7 op8 op9 op0 opq opw ope opr opt opy opu opi opo opp opa ops opd opf opg oph opj opk opl opz opx opc opv opb opn opm"
+allkeys="1 2 3 4 5 6 7 8 9 0 q w e r t y u i o p a s d f g h j k l z x c v b n m"
+allops_arr=($allops); allkeys_arr=($allkeys); allkeys_arr=("${allkeys_arr[@]:0:${#allops_arr[@]}}")
+## MENU ##
+mma:
+clear; echo '=== Main Menu ==='; for ((i=0; i<${#allops_arr[@]}; i++)); do echo "${allkeys_arr[i]}: ${allops_arr[i]}"; done; echo '\: Exit'
+read -rsn1 inkey; inkey=${inkey,,}; clear; case "$inkey" in
+'\') exit 0 ;; *) valid_option=false; for valid_key in "${allkeys_arr[@]}"; do if [ "$inkey" == "$valid_key" ]; then valid_option=true; break; fi; done; if [ "$valid_option" == "true" ]; then clear; jumpto "mma$inkey"; else jumpto mma; fi ;;
+esac
+## OPS ##
+mma1:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma2:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma3:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma4:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma5:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma6:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma7:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma8:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma9:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mma0:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaq:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaw:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmae:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmar:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmat:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmay:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmau:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmai:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmao:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmap:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaa:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmas:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmad:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaf:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmag:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmah:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaj:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmak:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmal:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmaz:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmax:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmac:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmav:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmab:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mman:
+echo 'you are at mma'; sleep 3
+jumpto mma
+mmam:
+echo 'you are at mma'; sleep 3
+jumpto mma

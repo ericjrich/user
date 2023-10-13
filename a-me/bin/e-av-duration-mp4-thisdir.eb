@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+clear; echo 'If you continue, all mp4 files in this DIR will be prepended with their duration in hhmmss'; echo 'Ctrl-C To Exit'; read junk
+clear
+# Iterate through all MP4 files in the current directory
+for file in *.mp4; do
+  if [ -f "$file" ]; then
+    # Get the duration of the video in hhmmss format
+    duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$file" | awk '{printf "%02d%02d%02d\n",int($1/3600),int($1%3600/60),int($1%60)}')
+
+    # Extract the filename without extension
+    filename_without_extension=$(basename -- "$file" .mp4)
+
+    # Create the new filename with duration prepended
+    new_filename="${duration}-${filename_without_extension}.mp4"
+
+    # Rename the file
+    mv "$file" "$new_filename"
+    echo "Renamed '$file' to '$new_filename'"
+  fi
+done

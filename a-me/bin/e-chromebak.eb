@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+#20231008_07:10_est--EJR
+#e-chrome-htmlmaker.eb
+
+#########__P R E P__########################################################################################################
+shopt -s dotglob
+# FUNTIONS
+crap() { read -n 1 -p '*ANY-KEY*'; echo; }
+jumpto() { local LV1=$1; local LV2=$(sed -n "/$LV1:/{:a;n;p;ba};" $0 | grep -v ':$'); sleep .1; eval "$LV2"; exit; }
+# VARS
+usb="/media/$USER/xusb/user"
+pc="$HOME"
+web="a-me/z-share/browserbak"
+repo="a-me/z-share/chrome.html"
+b1="chrome"
+usbrepo="$usb/$repo"  # /media/$USER/xusb/user/a-me/z-share/z-html-sites/z-repo/chrome.html
+usbweb="$usb/$web"    # /media/$USER/xusb/user/a-me/z-personal/web-browsers
+usbb1="$usbweb/$b1"   # /media/$USER/xusb/user/a-me/z-personal/web-browsers/chrome
+pcrepo="$pc/$repo"    # $HOME/a-me/z-share/z-html-sites/z-repo/chrome.html
+pcweb="$pc/$web"      # $HOME/a-me/z-personal/web-browsers/a-me/z-personal/web-browsers
+pcb1="$pcweb/$b1"     # $HOME/a-me/z-personal/web-browsers/chrome
+
+zw=""
+zb=""
+#########__M A I N  M E N U__###############################################################################################
+mma:
+clear
+echo -e "------ CHROME BACKUP HTML MAKER -------\n1 - USB_Chrome\n2 - PC_Chrome\nx - EXIT"
+read -rsn1 key; key=${key,,}; clear
+case "$key" in
+  '1') jumpto mma1 ;;
+  '2') jumpto mma2 ;;
+  'x') exit 0 ;;
+  *) jumpto mma ;;
+esac
+###################################################################################################
+# MAINS
+###################################################################################################
+
+## usb/chrome ###############
+mma1:
+zw="$usbweb"; zb="$usbb1"; zr="$usbrepo"; zback='mma1a'; jumpto gop1
+mma1a:
+jumpto mma
+## pc/chrome ###############
+mma2:
+zw="$pcweb"; zb="$pcb1"; zr="$pcrepo"; zback='mma2a'; jumpto gop1
+mma2a:
+jumpto mma
+###################################################################################################
+# SUBS
+###################################################################################################
+
+gop1:
+cd "$zw/"
+current_dir=$(basename "$PWD")
+###
+if [ "$current_dir" != "web-browsers" ]; then
+  echo -e 'You Need To Be In Correct Folder!\n(web-browsers/)'; exit 1
+fi
+###
+echo -e "== Ensure Your NEW Files Are Present (dont rename anything) ==\n * Imported chrome bookmarks (html)\n * Imported chrome passwords (csv)"
+echo -e " * Imported google passwords (csv) <-optional\nTO: ./chrome/og/\n\tAND/OR\nTO: ./chromium/og/"
+crap
+###
+clear
+cd -
+cd "$zb/"
+rm chrome.html chrome-bookmarks.html chrome-passwords.html pass.csv
+cp "$zr" ./
+cp og/*.* ./
+mv bookmarks_*.html chrome-bookmarks.html
+###
+if [ -e "Google Passwords.csv" ] && [ -e "Chrome Passwords.csv" ]; then
+  mv "Chrome Passwords.csv" cpass.csv
+  mv "Google Passwords.csv" gpass.csv
+  tail -n +2 "gpass.csv" > "gpasstmp.csv"
+  tail -n +2 "cpass.csv" > "cpasstmp.csv"
+  cat "gpasstmp.csv" "cpasstmp.csv" > "passtmp.csv"
+  sort -u "passtmp.csv" -o "sortedtmp.csv"
+  echo "name,url,username,password,note" | cat - "sortedtmp.csv" > "pass.csv"
+  rm gpass.csv cpass.csv gpasstmp.csv cpasstmp.csv passtmp.csv sortedtmp.csv
+else
+  mv "Chrome Passwords.csv" pass.csv
+fi
+###
+csv_file='pass.csv'
+sed -i -e '$a\' "$csv_file"
+output_path="chrome-passwords.html"
+###
+###################
+#VAR[HEREDOC]: HTML5_(1)
+cat <<EOF > "$output_path"
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Chrome Passwords</title>
+<style>table{border-collapse:collapse;width:100%;}th,td{text-align:left;padding:8px;border-bottom:1px solid #ddd;}tr:hover{background-color:#f5f5f5;}</style></head><body>
+<h1>Chrome Passwords</h1>
+<input type="text" id="search" onkeyup="searchTable()" placeholder="Search...">
+<table id="passwords-table"><thead><tr><th>Name</th><th>Website</th><th>Username</th><th>Password</th></tr></thead><tbody>
+EOF
+###################
+#VAR[HEREDOC]: HTML5_(2)
+while IFS=',' read -r name website username password; do cat <<EOF >> "$output_path"
+<tr><td>$name</td><td>$website</td><td>$username</td><td>$password</td></tr>
+EOF
+done < <(tail -n +2 "$csv_file")
+###################
+cat <<EOF >> "$output_path"
+</tbody></table><script>
+function searchTable() {const filter = document.getElementById("search").value.toLowerCase();
+const rows = document.querySelectorAll("#password-table tr");rows.forEach(row => {const cells = Array.from(row.querySelectorAll("td"))
+const found = cells.some(cell => cell.textContent.toLowerCase().includes(filter)); row.style.display = found ? "" : "none";});}
+</script></body></html>
+EOF
+###################
+cd -; clear
+jumpto "$zback"
+###################################################################################################

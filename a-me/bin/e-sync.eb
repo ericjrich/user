@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+# sync files
+#20231008_13:22_est--EJR
+shopt -s dotglob
+#== VARIABLES =======================================================
+zxd='--exclude=Desktop --exclude=Documents --exclude=Downloads --exclude=Music --exclude=Pictures --exclude=Public --exclude=Templates --exclude=Videos --exclude=.android --exclude=.cache --exclude=.config/cinnamon-monitors.xml --exclude=.config/pulse --exclude=.local/share/gvfs-metadata --exclude=.local/share/recently-used.xbel --exclude=lost+found --exclude=.xsession-errors --exclude=.xsession-errors.old'
+zxd7z='-xr\!\!Desktop -xr\!\!Documents -xr\!\!Downloads -xr\!\!Music -xr\!\!Pictures -xr\!\!Public -xr\!\!Templates -xr\!\!Videos -xr\!\!.android -xr\!\!.cache -xr\!\!.config/pulse -xr\!\!.local/share/gvfs-metadata -xr\!\!.xsession-errors -xr\!\!.xsession-errors.old -xr\!\!.config/cinnamon-monitors.xml -xr\!\!.local/share/recently-used.xbel -xr\!\!lost+found'
+
+xusbvt="/media/$USER/xusb_ventoy"
+xusb="/media/$USER/xusb"
+  xusbh="$xusb/user"
+  xusbh2="$xusb/user2"
+xtmpvt="/media/$USER/tmp_ventoy"
+xtmp="/media/$USER/tmp"
+  xtmph="$xtmp/user"
+  xusbh2="$xtmp/user2"
+xhddvt="/media/$USER/ext-2tb/xusbvt"
+xhdd="/media/$USER/ext-2tb/xusb"
+
+
+#== FUNCS ===========================================================
+# sanity checks
+  mad() { echo -e "Are Sure You Want To Continue? (y/n):\n $msg"; read -rsn1 bmad; echo; bmad=${bmad,,}; [ ! "$bmad" = "y" ] && exit 1; }
+# Ask For Locations
+  aska() { a=$(zenity --title="$msg: Choose Source" --file-selection --directory); }
+  askb() { b=$(zenity --title="$msg: Choose Destination" --file-selection --directory); }
+  askab() { a=$(zenity --title="$msg: Choose Source" --file-selection --directory); b=$(zenity --title="$msg: Choose Destination" --file-selection --directory); }
+# If Missing: Exit 1
+  noexita() { [ ! -d "$a" ] && exit 1; }
+  noexitb() { [ ! -d "$b" ] && exit 1; }
+  noexitab() { [ ! -d "$a" ] || [ ! -d "$b" ] && exit 1; }
+# If Missing: $nox=x
+  noxa() { if [ -d "$a" ]; then return 0; else return 1; fi; }
+  noxb() { if [ -d "$a" ]; then return 0; else return 1; fi; }
+  noxab() { if [ -d "$a" ] && [ -d "$b" ]; then return 0; else return 1; fi; }
+# Copy / Sync
+  copyabzz() { local bfa1="$a/a-me/bin/e-zz.eb"; local bfa2="$a/a-me/bin/e-zzz.eb"; local bfb1="$b/a-me/bin/e-zz.eb"; local bfb2="$b/a-me/bin/e-zzz.eb"
+    [ -e "$bfb1" ] && cp "$bfb1" "$bfa1"; echo '**** zz ****'
+    [ -e "$bfb2" ] && cp "$bfb2" "$bfa2"; echo '**** zzz ****'
+    cd $a/; cp .alias .bashrc .xbindkeysrc $b/; cp .icons/*.png $b/.icons/; rsync -avh --delete --exclude=lost+found/ a-me/ $b/a-me/
+    echo '#!/usr/bin/env bash' | tee "$bfa1" "$bfa2"; echo '**** shebang wipe ****'; }
+  copyab() { echo '**** Copying Files ****'
+    cd $a/; cp .alias .bashrc .xbindkeysrc $b/; cp .icons/*.png $b/.icons/; rsync -avh --delete --exclude=lost+found/ a-me/ $b/a-me/; }
+  syncab() { echo '**** Syncing Files ****'
+    rsync -avh --progress --delete --exclude=lost+found/ $a/ $b/; }
+  notes_zip_update() { local path="$a/a-me/z-share"; local dir="to-notes"; local zip="e-notes.zip"; local src="$path/$dir"; local dst="$path/$zip"
+    [ ! -e "$src" ] || [ ! -e "$dst" ] && return
+    echo '**** Adding Notes To Zip Archive ****'
+    cd $src/; for i in $(ls -A); do zip -ju "$dst" "$i"; rm "$i"; done; }
+# load settings
+  loadset() { local bnd1="$HOME/a-me/bin"; local bnd2="$HOME/a-me/z-personal/bin"
+    [ -d "$bnd1" ] && chmod +x $bnd1/*
+    [ -d "$bnd2" ] && chmod +x $bnd2/*
+    cd ~/; source .bashrc; xbindkeys --poll-rc; cd -; }
+
+#= menu ======================================================================================================================
+  clear
+  echo '------ EJR SYNC UTILITY ------'
+  echo '1) TMP 2 PC'
+  echo '2) USB 2 (PC / TMP / XHD)'
+  echo '3) SYNC: USB 2 TMP'
+  echo '4) ??? 2 ???'
+  echo '5)  PC 2 BAK'
+  echo '6) BAK 2 PC'
+  echo 'x) Exit'; read -rsn1 opkey; opkey=${opkey,,}; clear
+#= cases =====================================================================================================================
+case $opkey in
+### TMP 2 PC ##########################
+1)
+  msg='TMP 2 PC'; mad
+  a="$xtmph"; b="$HOME"; if noxab; then notes_zip_update; copyabzz; loadset; fi
+;;
+### USB 2 (PC / TMP / XHD) ############
+2)
+  msg='USB 2 (PC / TMP / XHD)'; mad
+  a="$xusbh"; b="$HOME"; if noxab; then notes_zip_update; copyabzz; loadset; fi
+  a="$xusb"; b="$xtmp"; if noxab; then syncab; fi; a="$xusbvt"; b="$xtmpvt"; if noxab; then syncab; fi
+  a="$xusb"; b="$xhdd"; if noxab; then syncab; fi; a="$xusbvt"; b="$xhddvt"; if noxab; then syncab; fi
+;;
+### SYNC: USB 2 TMP ###################
+3)
+  msg='SYNC: USB 2 TMP)'; mad
+  a="$xusb"; b="$xtmp"; if noxab; then syncab; fi; a="$xusbvt"; b="$xtmpvt"; if noxab; then syncab; fi
+;;
+### ??? 2 ??? #########################
+4)
+  msg='Sync ??? 2 ???'; mad
+  askab; if noxab; then syncab; fi
+;;
+### PC 2 BAK ###########################
+5)
+  msg='PC 2 BAK'; mad
+  msg=''
+  cd /
+  zhome=$(zenity --width=600 --height=420 --file-selection --directory --title='Select Home Folder To 7zap' --filename="/")
+  [ $? -eq 1 ] && exit 0
+  zb=$(zenity --width=600 --height=420 --file-selection --directory --title='Select DIR To Save 7zap' --filename="/")
+  [ $? -eq 1 ] && exit 0
+  zname=$(zenity --entry --title='Name Your Home 7zap' --text='Name:' --entry-text "pc")
+  [ $? -eq 1 ] && exit 0
+  ztime=$(date '+%Y%m%d-%H%M')
+  z7zap="$zb/$ztime-$zname.7z"
+  echo -e "\033[33mGoing to 7zap your home folder \033[36m $zhome \033[33m to a 7zap at \033[36m $z7zap\033[0m"
+  echo -e "\033[33mexlcudes \n \033[36m$zxd\033[0m"
+  mad
+  clear
+  echo '.....please wait.....'
+  cd "$zhome/"
+  7z a -mx=1 -p -mhe=on "$z7zap" "$zxd7z" .
+  cd -
+;;
+### BAK 2 PC ###########################
+6)
+  msg='BAK 2 PC'; mad
+  msg=''
+  cd /
+  z7zap=$(zenity --file-selection --title='Select Your 7zap File' --filename="/")
+  [ $? -eq 1 ] && exit 0
+  zhome=$(zenity --width=600 --height=420 --file-selection --directory --title='Select Home Folder To Overwrite' --filename="/")
+  [ $? -eq 1 ] && exit 0
+  echo -e "\033[33mGoing to extract your 7zap \033[36m$z7zap\033[33m to home-dir \033[36m $zhome\033[0m"
+  echo ''
+  mad
+  clear
+  echo 'please wait...'
+  ztmp="/tmp/zhome"; rm -r $ztmp/; mkdir "$ztmp/"
+  cd "$ztmp/"
+  #tar -xpf $ztar -C $ztmp/
+  7z x "$z7zap"
+  cd -
+  sudo rsync -avh --delete $zxd $ztmp/ $zhome/
+  rm -r $ztmp/
+  loadset
+  # AUDIO FIX
+  sudo rm /var/lib/alsa/asound.state
+  sudo alsactl init
+  sudo alsactl store
+  sudo alsa force-reload
+  pulseaudio -k
+  sudo sh -c "echo 0 > /sys/module/snd_hda_intel/parameters/power_save"
+  sudo sh -c "echo N > /sys/module/snd_hda_intel/parameters/power_save_controller"
+;;
+### END STUFF #########################
+x) exit 0;; *) exit 0;;
+esac

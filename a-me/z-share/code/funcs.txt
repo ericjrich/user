@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# FUNCTIONS WITH USES
+#20230930_14:26_est--EJR
+## FUNCS ##
+jumpto() { label=$1; cmd=$(sed -n "/$label:/{:a;n;p;ba};" $0 | grep -v ':$'); eval "$cmd"; exit; }
+# jumpto mma
+asky() { local ask; echo -n "$1 [y/n]"; read -n 1 ask < /dev/tty; echo; [ "${ask,,}" = "y" ]; }
+askn() { local ask; echo -n "$1 [y/n]"; read -n 1 ask < /dev/tty; echo; [ "${ask,,}" != "y" ]; }
+# askn "Continue?" && exit 0
+# asky "Do This Action?" && echo "Doing Action"
+# echo 'skipped that action'
+crap() { read -n 1 -p '*ANY-KEY*'; echo; }
+# echo 'hit key'; crap
+crab() { read -n 1 -p "$1 *ANY-KEY*"; echo; }
+# crab "Continue?"
+sayit() { spd-say -w -m some -t male1 -p -1 -r -30 "$1"; }
+# sayit "Hello"
+toclip() { echo -n "$1" | xclip -selection clipboard; }
+# toclip "Hello"
+fromclip() { local arg="$1"; local fclip=$(xclip -o -selection clipboard); eval "$arg=\"$fclip\""; }
+# fromclip newvar
+# echo "$newvar"
+py1() { local pyin1="$1"; local pycode=$(cat <<'PYEOF'
+#!/usr/bin/env python3
+# PYTHON3 CODE HERE
+print(var1, var2, var3, flush=True)
+PYEOF
+)
+local pyout=$(python3 -c "$pycode" "$pyin1"); read -r var1 var2 var3 <<< "$pyout"; }
+# #Run Python With This Variable
+# py1 "$exmpl"

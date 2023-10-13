@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+### prep ##############################
+  clear
+  shopt -s dotglob
+### Functions #########################
+  askyn() { echo -n "$1 [y/n]"; read -n 1 askyn < /dev/tty; echo; if [ "${askyn,,}" = "y" ]; then return 0; else return 1; fi; }
+  crap() { read -n 1 -p '*ANY-KEY*'; echo; }
+  crab() { read -n 1 -p "$1 *ANY-KEY*"; echo; }
+  sayit() { spd-say -w -m some -t male1 -p -1 -r -30 "$phrase"; }
+  werd() { local file="$1"; local lines=$(wc -l < "$file"); local rn_bytes=$(od -An -N2 -i /dev/urandom)
+  local line=$((1 + (rn_bytes * lines) / 65536)); local word=$(sed -n "${line}p" "$file"); phrase="$phrase $word"; }
+### vars ##############################
+  # $audio
+    if askyn 'Would you like audio with your phrases?'; then audio=0; else audio=1; fi
+  # more
+    zdir="$HOME/a-me/z-share/words"
+    zfiles=("articles" "nouns" "pronouns" "verbs" "adjectives" "adverbs" "conjunctions" "prepositions" "interjections" "males" "females" "unisex" "lastnames" "dicts" "alphas")
+    zchars='1 2 3 4 5 6 7 8 9 0 a b c d e'
+    zchars=($zchars)
+    declare -A zmenu
+  # Assign each character to its corresponding item
+    for ((i=0; i<${#zchars[@]}; i++)); do char="${zchars[i]}"; item="${zfiles[i]}"; zmenu["$char"]="$item"; order+=("$char"); done
+### The Menu ##########################
+  selected_items=()
+  while [ "${choice,,}" != "x" ]; do
+    clear
+    for char in "${order[@]}"; do echo "$char: ${zmenu[$char]}"; done
+    echo "🔗️: ${selected_items[@]}"
+    echo "Select an item by entering its number:"
+    read -rsn1 choice; choice="${choice,,}"
+    [ -z "$choice" ] && break
+    if [[ ! "$choice" =~ ^[0-9a-e]+$ ]]; then echo "Invalid input. Please enter a valid number."; clear; continue; fi
+    if [[ -n "${zmenu[$choice]}" ]]; then selected_items+=("${zmenu[$choice]}"); else echo "Invalid selection. Please choose a valid character (1 to 9, 0, a to e)."; sleep .5; clear; fi
+  done
+  for i in ${selected_items[@]};do bensel+=" $i"; done
+### word werds and vars for them ######
+  for i in $bensel; do t="list_$i"; eval "list_$i=\"$zdir/$i\""; werdz+=("$t"); done
+### output phrase (txt) ###############
+  clear
+  while true; do
+    phrase=''
+    for i in "${werdz[@]}"; do t="${!i}"; werd "$t"; done
+    phrase=${phrase# }
+    read -t .25 -N 1 input; if [[ $input = "q" ]] || [[ $input = "Q" ]]; then echo; break; fi
+    echo "$phrase"
+    if [ "$audio" -eq 0 ]; then sayit; else sleep 1; fi
+  done
+#########

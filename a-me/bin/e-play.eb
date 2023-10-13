@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#20230929_10:05_est--EJR
+
+zargs="$@"; [ -n "$zargs" ] && { ffplay $zargs >>/dev/null 2>&1 & disown; exit 0; }
+
+## VARS ####################################
+dirpc="$HOME/a-me/z-share/music"
+klist="1234567890qwertyuiopasdfghjklzxcvbnm"
+csv="$HOME/a-me/z-share/music/playlist.csv"
+IFS=','
+line_num=0
+declare -A menu_options
+declare -a menu_types
+declare -a menu_names
+declare -a menu_locations
+
+### Display menu options ###################
+clear
+while read -r line; do
+  if [ $line_num -gt 0 ]; then
+    IFS=',' read -r -a fields <<< "$line"
+    type="${fields[0]}"; name="${fields[1]}"; location="${fields[2]}"
+    klistkey="${klist:0:1}"; klist="${klist:1}"
+    menu_options["$klistkey"]="$klist" #menu_options["$klistkey"]="$type"
+    menu_types["$klistkey"]="$type"; menu_names["$klistkey"]="$name"; menu_locations["$klistkey"]="$location"
+    echo -e "$klistkey= 📻️\t$name"
+  fi
+  ((line_num++))
+done < "$csv"
+
+# Display menu and handle user input
+echo '+: 💿️ Select File'; echo '\: 🛑️'; echo "Hit Key For Option:"
+read -rsn1 press; echo; press=${press,,}; clear; case "$press" in
+  '+')
+    dirhere="$(pwd)"
+    dir2use="$dirhere"
+    [ -d "$dirpc" ] && dir2use="$dirpc"
+    cd "$dir2use"
+    zfilter='*.mp3 *.MP3 *.ogg *.OGG *.opus *.OPUS *.mp4 *.MP4 *.mkv *.MKV *.avi *.AVI *.wav *.WAV *.m4a *.M4A *.aac *.AAC *.flac *.FLAC *.wma *.WMA *.webm *.WEBM *.mov *.MOV'
+    zmedia=$(zenity --file-selection --file-filter="$zfilter" --title="Select Media To Open"); [ -z "$zmedia" ] && exit 0
+    ffplay $zmedia >>/dev/null 2>&1 & disown
+  ;;
+  '\')
+    exit 0
+  ;;
+  *)
+    if [ -n "${menu_options[$press]}" ]; then
+      playthis="${menu_locations[$press]}"
+      ffplay $playthis >>/dev/null 2>&1 & disown
+    else exit 0
+    fi
+  ;;
+esac
